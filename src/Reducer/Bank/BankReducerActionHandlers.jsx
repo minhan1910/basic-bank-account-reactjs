@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import BankActionTypeEnum from "./BankActionTypeEnum";
 import BankStatusEnum from "./BankStatusEnum";
+import { initialBankState } from "./index";
 
 const DEFAULT_BALANCE_OPEN_ACCOUNT = 500;
 const DEFAULT_DEPOSIT_MONEY = 150;
@@ -52,6 +53,10 @@ const bankReducerActionHandlers = {
   },
 
   [BankActionTypeEnum.PAY_LOAN]: (state, action) => {
+    if (state.loan > 0) {
+      return state;
+    }
+
     const balanceAfterPayLoan = state.balance - DEFAULT_REQUEST_LOAN;
 
     return {
@@ -63,12 +68,12 @@ const bankReducerActionHandlers = {
   },
 
   [BankActionTypeEnum.CLOSE_ACCOUNT]: (state, action) => {
+    if (state.balance !== 0 || state.loan !== 0) {
+      return state;
+    }
+
     return {
-      ...state,
-      status:
-        state.balance === 0 && state.loan === 0
-          ? BankStatusEnum.DEACTIVE_ACCOUNT
-          : state.status,
+      ...initialBankState,
     };
   },
 };
